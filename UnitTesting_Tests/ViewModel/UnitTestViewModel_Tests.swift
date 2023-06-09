@@ -64,5 +64,54 @@ final class UnitTestViewModel_Tests: XCTestCase {
             XCTAssertEqual(vm.isPremium, userIsPremium) // checks if isPremium is set up properly
         }
     }
+    
+    func test_UnitTestViewModel_dataArray_shouldBeEmpty() {
+        // Given <- no given
+        // When
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // Then
+        XCTAssertTrue(vm.dataArray.isEmpty) // checks arrary is empty
+        XCTAssertEqual(vm.dataArray.count, 0) // checks count is 0
+    }
+    
+    func test_UnitTestViewModel_dataArray_shouldAddItems() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        vm.addItem(item: UUID().uuidString) // creates a random string of 36 chars | Better practice to create a function that generates a random stirnf of any size
+        // Then
+        XCTAssertTrue(!vm.dataArray.isEmpty) // checks arrary is not empty
+        XCTAssertFalse(vm.dataArray.isEmpty)
+        XCTAssertEqual(vm.dataArray.count, 1) // checks count is 1
+        XCTAssertNotEqual(vm.dataArray.count, 0) // checks count is not 0
+        XCTAssertGreaterThan(vm.dataArray.count, 0)
+    }
+    
+    func test_UnitTestViewModel_dataArray_shouldAddItems_stress() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        let loopCount: Int = Int.random(in: 1..<100) // loop count is random Int b/w 1 to 100
+        for _ in 0..<loopCount {
+            vm.addItem(item: UUID().uuidString)
+        }
+        
+        // Then
+        XCTAssertTrue(!vm.dataArray.isEmpty) // checks arrary is not empty
+        XCTAssertFalse(vm.dataArray.isEmpty)
+        XCTAssertEqual(vm.dataArray.count, loopCount) // checks count is loop count
+        XCTAssertNotEqual(vm.dataArray.count, 0) // checks count is not 0
+        XCTAssertGreaterThan(vm.dataArray.count, 0)
+    }
+
+    
+    func test_UnitTestViewModel_dataArray_shouldNotAddBlackString() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        vm.addItem(item: "")
+        // Then
+        XCTAssertTrue(vm.dataArray.isEmpty) // checks arrary is  empty
+    }
 
 }
