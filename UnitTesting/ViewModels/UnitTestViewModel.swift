@@ -33,4 +33,27 @@ class UnitTestViewModel: ObservableObject {
         }
     }
     
+    // save item or may thorw the item
+    func saveItem(item: String) throws {
+        guard !item.isEmpty else {
+            // throws if item is empty string
+            throw DataError.noData
+        }
+        
+        if let x = dataArray.first(where: { $0 == item }) {
+            print("Save item here \(x)")
+        } else {
+            throw DataError.dataNotFound
+        }
+        
+    }
+    
+}
+
+extension UnitTestViewModel {
+    // custom errors for this vm
+    enum DataError: LocalizedError {
+        case noData
+        case dataNotFound
+    }
 }

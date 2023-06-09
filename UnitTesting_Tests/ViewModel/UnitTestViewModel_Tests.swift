@@ -170,10 +170,77 @@ final class UnitTestViewModel_Tests: XCTestCase {
         // retrieve random item from local array for selectedItem()
         let randomItem = itemsArray.randomElement() ?? ""
         vm.selectedItem(item: randomItem)
-        
+        XCTAssertFalse(randomItem.isEmpty) // fail safe
         // Then
         XCTAssertEqual(vm.selectedItem, randomItem)
         XCTAssertNotNil(vm.selectedItem)
     }
+    
+    func test_UnitTestViewModel_saveItem_shouldThrowError_noData() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        let loopCount: Int = Int.random(in: 1..<100)
+        for _ in 0..<loopCount {
+            let newItem = UUID().uuidString
+            vm.addItem(item: newItem)
+        }
+        
+        // Then
+        XCTAssertThrowsError(try vm.saveItem(item: ""))
+        XCTAssertThrowsError(try vm.saveItem(item: ""), "Should throw Item Not Found error!") { error in
+            let returnedError = error as? UnitTestViewModel.DataError
+            XCTAssertEqual(returnedError, UnitTestViewModel.DataError.noData)
+        }
+    }
+    
+    func test_UnitTestViewModel_saveItem_shouldThrowError_dataNotFound() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        let loopCount: Int = Int.random(in: 1..<100)
+        for _ in 0..<loopCount {
+            let newItem = UUID().uuidString
+            vm.addItem(item: newItem)
+        }
+        
+        // Then
+            // Do block does the same thing as noData test but in a clean way
+        do {
+            try vm.saveItem(item: UUID().uuidString)
+        } catch let error {
+            let returnedError = error as? UnitTestViewModel.DataError
+            XCTAssertEqual(returnedError, UnitTestViewModel.DataError.dataNotFound)
+        }
+    }
+    
+    func test_UnitTestViewModel_saveItem_shouldSaveItem() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        
+        // When
+        let loopCount: Int = Int.random(in: 1..<100)
+        // local item array
+        var itemsArray: [String] = []
+        
+        for _ in 0..<loopCount {
+            let newItem = UUID().uuidString
+            vm.addItem(item: newItem)
+            itemsArray.append(newItem)
+        }
+        
+        // retrieve random item from local array for selectedItem()
+        let randomItem = itemsArray.randomElement() ?? ""
+        XCTAssertFalse(randomItem.isEmpty) // fail safe
+        // Then
+        XCTAssertNoThrow(try vm.saveItem(item: randomItem)) // doesn't throw an error
+        
+        do {
+            try vm.saveItem(item: randomItem)
+        } catch {
+            XCTFail()
+        }
+    }
+
 
 }
