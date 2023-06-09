@@ -13,10 +13,12 @@ class UnitTestViewModel: ObservableObject {
     @Published var isPremium: Bool
     @Published var dataArray: [String] = []
     @Published var selectedItem: String? = nil
+    let dataService: DataServiceProtocol
     
     // injection of dependency -> allows us to test the different cases of isPremium
-    init(isPremium: Bool) {
+    init(isPremium: Bool, dataService: DataServiceProtocol = MockDataService(items: nil)) {
         self.isPremium = isPremium
+        self.dataService = dataService
     }
     
     func addItem(item: String) {
@@ -45,7 +47,12 @@ class UnitTestViewModel: ObservableObject {
         } else {
             throw DataError.dataNotFound
         }
-        
+    }
+    
+    func downloadWithEscaping() {
+        dataService.downloadItemsWithEscaping { returnedItem in
+            self.dataArray = returnedItem
+        }
     }
     
 }

@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import UnitTesting // <-- importing the target App in oder for its compoennts to be tested within target testing
+import Combine
 
 /*
  Naming Structure: test_UnitOfWork_StateUnderTest_ExpectedBehaviour
@@ -18,7 +19,8 @@ import XCTest
 final class UnitTestViewModel_Tests: XCTestCase {
     
     var viewModel: UnitTestViewModel?
-
+    var cancelables = Set<AnyCancellable>()
+    
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         viewModel = UnitTestViewModel(isPremium: Bool.random())
@@ -26,7 +28,7 @@ final class UnitTestViewModel_Tests: XCTestCase {
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
-        viewModel = nil 
+        viewModel = nil
     }
 
     func test_UnitTestingViewModel_isPermium_shouldBeTrue() {
@@ -259,5 +261,27 @@ final class UnitTestViewModel_Tests: XCTestCase {
         }
     }
 
+    // Testing async code
+    func test_UnitTestViewModel_downloadWithEscaping_shouldReturnItems() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        
+        // When
+        let expectation = XCTestExpectation(description: "Should return items after 3 seconds")
+        
+        vm.$dataArray
+            .dropFirst() // drop the init value of []
+            .sink{ returnedItems in
+                expectation.fulfill()
+            }
+            .store(in: &cancelables)
+        
+        vm.downloadWithEscaping()
+        
+        // Then
+        wait(for: [expectation], timeout: 5 )
+        XCTAssertGreaterThan(vm.dataArray.count, 0) // making sure items are being added
+        
+    }
 
 }
