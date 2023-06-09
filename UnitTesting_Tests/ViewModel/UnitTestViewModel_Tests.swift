@@ -113,5 +113,67 @@ final class UnitTestViewModel_Tests: XCTestCase {
         // Then
         XCTAssertTrue(vm.dataArray.isEmpty) // checks arrary is  empty
     }
+    
+    func test_UnitTestViewModel_selectedItem_shouldStartAsNil() {
+        // Given
+        // When
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // Then
+        XCTAssertTrue(vm.selectedItem == nil) // checks is nil
+        XCTAssertNil(vm.selectedItem)
+    }
+    
+    func test_UnitTestViewModel_selectedItem_shouldBeNilWhenSelectingInvalidItem() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        // select valid item
+        let newItem = UUID().uuidString
+        vm.addItem(item: newItem)
+        vm.selectedItem(item: newItem)
+        
+        // select bad item after
+        vm.selectedItem(item: UUID().uuidString)
+        
+        // Then
+        XCTAssertNil(vm.selectedItem)
+    }
+    
+    func test_UnitTestViewModel_selectedItem_shouldBeSelected() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        let newItem = UUID().uuidString
+        vm.addItem(item: newItem)
+        vm.selectedItem(item: newItem)
+        
+        // Then
+        XCTAssertEqual(vm.selectedItem, newItem)
+        XCTAssertNotNil(vm.selectedItem)
+    }
+    
+    // a strong test
+    func test_UnitTestViewModel_selectedItem_shouldBeSelected_stress() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        let loopCount: Int = Int.random(in: 1..<100)
+        // local item array
+        var itemsArray: [String] = []
+        
+        for _ in 0..<loopCount {
+            let newItem = UUID().uuidString
+            vm.addItem(item: newItem)
+            itemsArray.append(newItem)
+        }
+        
+        // retrieve random item from local array for selectedItem()
+        let randomItem = itemsArray.randomElement() ?? ""
+        vm.selectedItem(item: randomItem)
+        
+        // Then
+        XCTAssertEqual(vm.selectedItem, randomItem)
+        XCTAssertNotNil(vm.selectedItem)
+    }
 
 }
