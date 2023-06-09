@@ -14,6 +14,7 @@ class UnitTestViewModel: ObservableObject {
     @Published var dataArray: [String] = []
     @Published var selectedItem: String? = nil
     let dataService: DataServiceProtocol
+    var cancelables = Set<AnyCancellable>()
     
     // injection of dependency -> allows us to test the different cases of isPremium
     init(isPremium: Bool, dataService: DataServiceProtocol = MockDataService(items: nil)) {
@@ -49,10 +50,20 @@ class UnitTestViewModel: ObservableObject {
         }
     }
     
+    // use [weak self] with async code and self? will be need
     func downloadWithEscaping() {
-        dataService.downloadItemsWithEscaping { returnedItem in
-            self.dataArray = returnedItem
+        dataService.downloadItemsWithEscaping { [weak self] returnedItem in
+            self?.dataArray = returnedItem
         }
+    }
+    
+    func downloadWithCombine() {
+        dataService.downloadItemsWithCombine()
+            .sink(receiveCompletion: { _ in
+            }, receiveValue: { [weak self] returnedItem in
+                self?.dataArray = returnedItem
+            })
+            .store(in: &cancelables)
     }
     
 }

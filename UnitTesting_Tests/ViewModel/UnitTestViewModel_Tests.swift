@@ -281,7 +281,27 @@ final class UnitTestViewModel_Tests: XCTestCase {
         // Then
         wait(for: [expectation], timeout: 5 )
         XCTAssertGreaterThan(vm.dataArray.count, 0) // making sure items are being added
+    }
+    
+    func test_UnitTestViewModel_downloadWithCombine_shouldReturnItems() {
+        // Given
+        let vm = UnitTestViewModel(isPremium: Bool.random())
         
+        // When
+        let expectation = XCTestExpectation(description: "Should return items after a seconds")
+        
+        vm.$dataArray
+            .dropFirst() // drop the init value of []
+            .sink{ returnedItems in
+                expectation.fulfill()
+            }
+            .store(in: &cancelables)
+        
+        vm.downloadWithCombine()
+        
+        // Then
+        wait(for: [expectation], timeout: 5 )
+        XCTAssertGreaterThan(vm.dataArray.count, 0) // making sure items are being added
     }
 
 }
