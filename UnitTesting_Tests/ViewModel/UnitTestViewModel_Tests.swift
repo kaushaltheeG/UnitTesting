@@ -16,13 +16,17 @@ import XCTest
  */
 
 final class UnitTestViewModel_Tests: XCTestCase {
+    
+    var viewModel: UnitTestViewModel?
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
+        viewModel = UnitTestViewModel(isPremium: Bool.random())
     }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+        viewModel = nil 
     }
 
     func test_UnitTestingViewModel_isPermium_shouldBeTrue() {
@@ -105,9 +109,22 @@ final class UnitTestViewModel_Tests: XCTestCase {
     }
 
     
-    func test_UnitTestViewModel_dataArray_shouldNotAddBlackString() {
+    func test_UnitTestViewModel_dataArray_shouldNotAddBlankString() {
         // Given
         let vm = UnitTestViewModel(isPremium: Bool.random())
+        // When
+        vm.addItem(item: "")
+        // Then
+        XCTAssertTrue(vm.dataArray.isEmpty) // checks arrary is  empty
+    }
+    
+    func test_UnitTestViewModel_dataArray_shouldNotAddBlankString2() {
+        // Given
+            // uses the vm from the setUpWithError
+        guard let vm = viewModel else {
+            XCTFail() // test fails
+            return
+        }
         // When
         vm.addItem(item: "")
         // Then
