@@ -11,8 +11,8 @@ struct UnitTestingView: View {
     
     @StateObject private var vm: UnitTestViewModel
     
-    init(isPreminum: Bool) {
-        _vm = StateObject(wrappedValue: UnitTestViewModel(isPremium: isPreminum))
+    init(isPremium: Bool) {
+        _vm = StateObject(wrappedValue: UnitTestViewModel(isPremium: isPremium))
     }
     var body: some View {
         Text(vm.isPremium.description)
@@ -21,6 +21,6 @@ struct UnitTestingView: View {
 
 struct UnitTestingView_Previews: PreviewProvider {
     static var previews: some View {
-        UnitTestingView(isPreminum: true)
+        UnitTestingView(isPremium: true)
     }
 }
